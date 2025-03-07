@@ -44,7 +44,7 @@
             margin-bottom: 10px;
             padding: 10px;
             font-weight: bold;
-            background-color: #ff9ccd;
+            background-color: #88705a;
             color: white;
             border-radius: 4px;
             text-align: center;
@@ -119,7 +119,7 @@
             padding: 15px;
             border: none;
             border-radius: 4px;
-            background-color: #ec87cc;
+            background-color: #88705a;
             color: #fff;
             font-size: 18px;
             cursor: pointer;
@@ -264,19 +264,7 @@
 
 <body>
     <div class="container">
-        <h1>メナード推しメイクアンケート</h1>
-        <div class="info-text">簡単なアンケートになります❤️<br>是非プレゼントをゲットしてくださいね♪</div>
-
-        <div class="label">メイクする時のこだわりはなんですか？</div>
-        <div class="demand-buttons">
-            <button type="button" id="onedemand" onclick="selectdemand(this)">リップ</button>
-            <button type="button" id="twodemand" onclick="selectdemand(this)">アイブロウ</button>
-            <button type="button" id="threedemand" onclick="selectdemand(this)">マスカラ/アイライン</button>
-            <button type="button" id="fourdemand" onclick="selectdemand(this)">その他</button>
-        </div>
-
-        <div class="label">【その他】を選択された方はご入力ください</div>
-        <textarea id="message3" rows="1" placeholder="入力してください"></textarea> <!-- メッセージ入力フィールド -->
+        <h1>メナードVITS店アンケート</h1>
 
         <div class="label">お名前(漢字フルネーム)</div>
         <textarea id="message" rows="1" placeholder="入力してください"></textarea> <!-- メッセージ入力フィールド -->
@@ -300,18 +288,32 @@
             <button type="button" id="twelvepriority" onclick="selectpriority(this)">12月</button>
         </div>
 
+        <div class="label">気になるお肌のお悩みが<br>ありましたら教えてください</div>
+        <div class="demand-buttons">
+            <button type="button" id="onedemand" onclick="selectdemand(this)">シミ</button>
+            <button type="button" id="twodemand" onclick="selectdemand(this)">小シワ</button>
+            <button type="button" id="threedemand" onclick="selectdemand(this)">シワ・たるみ</button>
+            <button type="button" id="fourdemand" onclick="selectdemand(this)">ニキビ</button>
+            <button type="button" id="fivedemand" onclick="selectdemand(this)">乾燥</button>
+            <button type="button" id="sixdemand" onclick="selectdemand(this)">毛穴</button>
+            <button type="button" id="sevendemand" onclick="selectdemand(this)">くすみ</button>
+            <button type="button" id="eightdemand" onclick="selectdemand(this)">その他</button>
+        </div>
+
+        <div class="info-text">お肌・エステで気になることがあれば<br>お気軽にこのLINEにお問い合わせください</div>
+
         <button class="submit-button" onclick="submitForm()">アンケート送信</button> <!-- フォーム送信ボタン -->
     </div>
 
     <script src="https://static.line-scdn.net/liff/edge/2.1/sdk.js"></script> <!-- LIFF SDKの読み込み -->
     <script>
         let priorityCount = '';
-        let demandCount = '';
+        let demandCount = [];
 
         // LIFF初期化
         document.addEventListener('DOMContentLoaded', function () {
             liff.init({
-                liffId: '2005254357-zKma9BZk' // ここにあなたのLIFF IDを入力
+                liffId: '2007026830-0Xwx96qZ' // ここにあなたのLIFF IDを入力
             }).then(() => {
                 // LIFF初期化成功時の処理
                 console.log('LIFF初期化成功');
@@ -345,28 +347,29 @@
         }
 
         function selectdemand(element) {
-            // 単一選択項目の処理コード
-            const buttons = document.querySelectorAll('.demand-buttons button');
-            buttons.forEach(button => button.classList.remove('active'));
+            // 複数選択項目の処理コード
+            const demandName = element.innerText;
 
-            // 選択されたボタンだけにactiveクラスを追加
-            element.classList.add('active');
-            demandCount = element.innerText;
+            if (element.classList.contains('active')) {
+                element.classList.remove('active');
+                demandCount = demandCount.filter(demand => demand !== demandName);
+            } else {
+                element.classList.add('active');
+                demandCount.push(demandName);
+            }
         }
 
         function submitForm() {
             const message = document.getElementById('message').value;
             const message2 = document.getElementById('message2').value;
-            const message3 = document.getElementById('message3').value;
             priorityCount: priorityCount;
             demandCount: demandCount;
 
             const formData = {
                 message,
                 message2,
-                message3,
                 priorityCount,
-                demandCount,
+                demandCount: demandCount.join('\n・') // 改行区切りにする
             };
 
             // フォームデータのチェック
@@ -387,16 +390,10 @@
                 return;
             }
 
-            // フォームデータのチェック
-            if (!formData.demandCount) {
-                alert('メイクする時のこだわりはなんですかをご選択ください。');
-                return;
-            }
-
             // LINEトークにメッセージを送信
             liff.sendMessages([{
                 type: 'text',
-                text: `≪アンケート≫\n【メイクする時のこだわりはなんですか？】\n・${formData.demandCount}\n\n【その他】\n・${formData.message3}\n\n【お名前(漢字フルネーム)】\n・${formData.message}\n\n【お名前(ふりがな)】\n・${formData.message2}\n\n【誕生月】\n・${formData.priorityCount}`
+                text: `≪アンケート≫\n【お名前(漢字フルネーム)】\n・${formData.message}\n\n【お名前(ふりがな)】\n・${formData.message2}\n\n【誕生月】\n・${formData.priorityCount}\n\n【誕生月】\n・${formData.demandCount}`
             }]).then(() => {
                 /* メッセージ送信成功時の処理 */
                 alert('ご記入ありがとうございます！');
